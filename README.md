@@ -1,4 +1,4 @@
-#AESFileEncryptor
+# AESFileEncryptor
 A simple python program that encrypts and decrypts a file with AES-256, based on a generated key from the
 plain password, salt and secure random IV.
 
