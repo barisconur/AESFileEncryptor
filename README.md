@@ -7,8 +7,17 @@ plain password, salt and secure random IV.
 ```
 chmod +x crypto
 ```
-* Change python path (Line 1 at crypto). Use your own python location, simply run "whereis python" in the terminal and do not forget to replace your python path in crypto file.
+* Change python path (Line 1 at crypto). Use your own python location. Simply run below command to find your python path
+```
+whereis python
+```
 
  ## Demo
-* sudo ./crypto -enc sample/file2encrypt.txt sample/cipher --> The command will create a file called cipher in the sample folder.
-* sudo ./crypto -dec sample/cipher sample/plaintext --> The command will decrypt cipher and creates a file caled plaintext. And only if you enter correct password, you will access unencrypted data.
+* The command will create a file called cipher in the sample folder.
+```
+sudo ./crypto -enc sample/file2encrypt.txt sample/cipher
+```
+* The command will decrypt cipher and creates a file caled plaintext. And only if you enter correct password, you will access unencrypted data.
+```
+sudo ./crypto -dec sample/cipher sample/plaintext
+```
