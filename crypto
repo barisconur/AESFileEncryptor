@@ -1,0 +1,56 @@
+#!/usr/bin/python3.8
+import os, sys
+from getpass import getpass
+from Crypto.Cipher import AES
+from Crypto.Hash import SHA256
+from Crypto import Random
+
+secureRandom = Random.new()
+
+def Main():
+  if len(sys.argv) != 4: # commands: ./crypto -enc file2encrypt.txt cipher | ./crypto -dec ./cipher plaintext
+      raise Exception("There is a missing argument(s). Try again")
+
+  mode = sys.argv[1] # options: -erc | -dec
+  input = sys.argv[2] # -enc: it is the file will be encrypted | -dec: it is the generated cipher file
+  out = sys.argv[3] # -enc: it is the generated cipher file name | -dec: it is the generated plaintext from cipher
+  password = getpass("Password:") #
+
+  if mode == '-enc':
+    hmac = calcDigest(password)
+    encryptFile(hmac, input, out)
+  elif mode == '-dec':
+    hmac = calcDigest(password)
+    decryptFile(hmac, input, out)
+  else:
+    raise Exception('There is no such mode for this program. You can only encrypt (-enc) or decrypt(-dec) a file')
+
+def encryptFile(key, fileName, outputFile):
+    with open(fileName , 'rb') as fileWillBeEncrypted:
+        IV = secureRandom.read(16)
+        AESBlockCipher = AES.new(key, AES.MODE_CBC, IV)
+        fileSize = str(os.stat(fileName).st_size).zfill(16)
+
+        with open(outputFile, 'wb') as cipher:
+            cipher.write(fileSize.encode('utf-8'))
+            cipher.write(IV)
+            fileInStringFormat = fileWillBeEncrypted.read()
+            if len(fileInStringFormat) % 16 != 0:
+                fileInStringFormat += b' ' * (16 - (len(fileInStringFormat) % 16))
+            cipher.write(AESBlockCipher.encrypt(fileInStringFormat))
+
+def decryptFile(key, filename, outputFile):
+    with open(filename, 'rb') as cipher:
+        fileSize = int(cipher.read(16))
+        IV = cipher.read(16)
+        AESBlockCipher = AES.new(key, AES.MODE_CBC, IV)
+
+        with open(outputFile, 'wb') as plainText:
+            plainText.write(AESBlockCipher.decrypt(cipher.read()))
+
+def calcDigest(password):
+    hash = SHA256.new(password.encode('utf-8'))
+    password = secureRandom.read(16) # deleting the password after generate the digest
+    return hash.digest()
+
+if __name__ == '__main__': Main()
